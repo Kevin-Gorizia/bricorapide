@@ -1,13 +1,9 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { User, AuthContextType } from "../types";
 import api from "../lib/api";
-import { useNotification } from "./NotificationContext";
+import type { ReactNode } from "react";
+
+import { useNotification } from "./useNotification";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -32,8 +28,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await api.get("/auth/me");
       setUser(response.data.user);
     } catch (error) {
-      // L'utilisateur n'est pas authentifié
-      setUser(null);
+      console.error("Erreur capturée :", error);
+      throw new Error("Problème !");
     } finally {
       setIsLoading(false);
     }
@@ -47,10 +43,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Le token est maintenant stocké dans un cookie HttpOnly côté serveur
       setUser(response.data.user);
       showSuccess("Connexion réussie !");
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Erreur de connexion";
+    } catch (error: unknown) {
+      let message = "Erreur de connexion";
+
+      // Vérifie si error est un objet avec response.data.message
+      if (typeof error === "object" && error !== null && "response" in error) {
+        // TypeScript ne sait pas exactement, donc on cast
+        const err = error as { response?: { data?: { message?: string } } };
+        if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+
       showError(message);
-      throw error;
+      throw error; // tu peux toujours relancer si besoin
     } finally {
       setIsLoading(false);
     }
@@ -61,12 +67,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await api.post("/auth/logout");
       setUser(null);
       showSuccess("Déconnexion réussie");
-    } catch (error) {
-      // Même en cas d'erreur, on déconnecte l'utilisateur côté client
-      setUser(null);
-      showError("Erreur lors de la déconnexion");
+    } catch (error: unknown) {
+  // Même en cas d'erreur, on déconnecte l'utilisateur côté client
+  setUser(null);
+  let message = "Erreur lors de la déconnexion";
+
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const err = error as { response?: { data?: { message?: string } } };
+    if (err.response?.data?.message) {
+      message = err.response.data.message;
     }
-  };
+  }
+
+  showError(message);
+}
 
   const value: AuthContextType = {
     user,
@@ -86,6 +100,7 @@ export function useAuth(): AuthContextType {
   }
   return context;
 }
+
 
 // Hook pour protéger les routes
 export function useRequireAuth() {

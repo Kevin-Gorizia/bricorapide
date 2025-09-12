@@ -1,7 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import type { ReactNode } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import type { NotificationContextType } from "../types";
-import { NotificationContext } from "./NotificationContextObject";
+import { createContext } from "react";
+export const NotificationContext = createContext<
+  NotificationContextType | undefined
+>(undefined);
 
 interface NotificationProviderProps {
   children: ReactNode;
