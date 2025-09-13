@@ -3,7 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
 import { HiCalculator, HiCreditCard } from "react-icons/hi";
-import { useNotification } from "../../contexts/useNotification";
+import { useNotification } from "../../contexts/UseNotification";
 import { useAuth } from "../../contexts/AuthContext";
 import { validateBookingForm } from "../../utils/validation";
 import { calculatePricing, formatPrice } from "../../utils/pricing";

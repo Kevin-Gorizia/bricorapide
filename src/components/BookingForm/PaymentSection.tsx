@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
 import { HiArrowLeft, HiLockClosed, HiCreditCard } from "react-icons/hi";
-import { useNotification } from "../../contexts/NotificationContext";
+import { useNotification } from "../../contexts/UseNotification";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatPrice } from "../../utils/pricing";
 import type { BookingFormData, PricingCalculation } from "../../types";

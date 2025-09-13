@@ -1,9 +1,9 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import type { User, AuthContextType } from "../types";
 import api from "../lib/api";
 import type { ReactNode } from "react";
-
-import { useNotification } from "./useNotification";
+import { useNotification } from "./UseNotification";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -24,12 +24,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      // Appel API pour vérifier l'authentification via cookie HttpOnly
       const response = await api.get("/auth/me");
       setUser(response.data.user);
-    } catch (error) {
-      console.error("Erreur capturée :", error);
-      throw new Error("Problème !");
+    } catch {
+      // tu peux loguer l'erreur si besoin
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -39,24 +38,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       const response = await api.post("/auth/login", { email, password });
-
-      // Le token est maintenant stocké dans un cookie HttpOnly côté serveur
       setUser(response.data.user);
       showSuccess("Connexion réussie !");
     } catch (error: unknown) {
       let message = "Erreur de connexion";
-
-      // Vérifie si error est un objet avec response.data.message
       if (typeof error === "object" && error !== null && "response" in error) {
-        // TypeScript ne sait pas exactement, donc on cast
         const err = error as { response?: { data?: { message?: string } } };
         if (err.response?.data?.message) {
           message = err.response.data.message;
         }
       }
-
       showError(message);
-      throw error; // tu peux toujours relancer si besoin
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -68,19 +61,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       showSuccess("Déconnexion réussie");
     } catch (error: unknown) {
-  // Même en cas d'erreur, on déconnecte l'utilisateur côté client
-  setUser(null);
-  let message = "Erreur lors de la déconnexion";
-
-  if (typeof error === "object" && error !== null && "response" in error) {
-    const err = error as { response?: { data?: { message?: string } } };
-    if (err.response?.data?.message) {
-      message = err.response.data.message;
+      setUser(null);
+      let message = "Erreur lors de la déconnexion";
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const err = error as { response?: { data?: { message?: string } } };
+        if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      showError(message);
     }
-  }
-
-  showError(message);
-}
+  }; // 👈 ICI tu avais oublié de fermer
 
   const value: AuthContextType = {
     user,
@@ -101,14 +92,12 @@ export function useAuth(): AuthContextType {
   return context;
 }
 
-
 // Hook pour protéger les routes
 export function useRequireAuth() {
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // Rediriger vers la page de connexion
       window.location.href = "/login";
     }
   }, [isAuthenticated, isLoading]);

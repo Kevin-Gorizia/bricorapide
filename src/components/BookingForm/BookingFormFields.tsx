@@ -1,11 +1,9 @@
-import React from "react";
 import {
   HiUser,
   HiMail,
   HiPhone,
   HiLocationMarker,
   HiCalendar,
-  HiDocumentText,
 } from "react-icons/hi";
 import { requiresSurface, getServiceDescription } from "../../utils/pricing";
 import type { BookingFormData, ServiceType } from "../../types";
@@ -14,7 +12,7 @@ import Input from "../ui/Input";
 interface BookingFormFieldsProps {
   formData: BookingFormData;
   errors: Record<string, string>;
-  onChange: (field: keyof BookingFormData, value: any) => void;
+  onChange: (field: keyof BookingFormData, value: string | number) => void;
 }
 
 export default function BookingFormFields({

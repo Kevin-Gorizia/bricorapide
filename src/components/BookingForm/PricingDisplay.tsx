@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { HiCash, HiTruck, HiReceiptTax } from "react-icons/hi";
 import {

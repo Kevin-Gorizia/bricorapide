@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  Routes,
-  Route,
-  Link,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -12,15 +7,12 @@ import {
   User,
   Phone,
   Mail,
-  MapPin,
-  Calendar,
   CreditCard,
   CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import "./App.css";
 
-// Composant Header amélioré
+// --- Header ---
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -37,7 +29,6 @@ function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
               className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold"
@@ -56,7 +47,6 @@ function Header() {
             </div>
           </Link>
 
-          {/* Navigation desktop */}
           <nav className="hidden md:flex items-center gap-6">
             {navigationItems.map((item) => (
               <Link
@@ -77,7 +67,6 @@ function Header() {
             ))}
           </nav>
 
-          {/* Actions desktop */}
           <div className="hidden md:flex items-center gap-4">
             <Link to="/booking">
               <motion.button
@@ -90,7 +79,6 @@ function Header() {
             </Link>
           </div>
 
-          {/* Menu mobile toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -104,7 +92,6 @@ function Header() {
           </button>
         </div>
 
-        {/* Menu mobile */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -140,7 +127,7 @@ function Header() {
   );
 }
 
-// Composant Hero amélioré
+// --- Hero ---
 function Hero() {
   return (
     <section className="bg-gradient-to-b from-white to-orange-50">
@@ -199,18 +186,14 @@ function Hero() {
   );
 }
 
-// Composant de formulaire de réservation amélioré
+// --- BookingForm ---
 function BookingForm() {
   const [formData, setFormData] = useState({
     nom: "",
     email: "",
     telephone: "",
-    service: "meuble",
-    surface: "",
+    service: "",
     distance: "",
-    adresse: "",
-    description: "",
-    datePreferee: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -220,45 +203,31 @@ function BookingForm() {
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
-    if (!formData.email.trim()) newErrors.email = "L'email est requis";
-    if (!formData.telephone.trim())
-      newErrors.telephone = "Le téléphone est requis";
-    if (!formData.adresse.trim()) newErrors.adresse = "L'adresse est requise";
-    if (!formData.datePreferee) newErrors.datePreferee = "La date est requise";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
+    if (
+      !formData.nom ||
+      !formData.email ||
+      !formData.telephone ||
+      !formData.service
+    ) {
+      setErrors({ global: "Tous les champs sont requis" });
+      return;
+    }
 
     setIsSubmitting(true);
-
-    // Simulation d'un appel API
+    // Simuler API
     await new Promise((resolve) => setTimeout(resolve, 1500));
-
     setIsSubmitting(false);
     setShowPayment(true);
   };
 
   const handlePayment = async () => {
     setIsSubmitting(true);
-
-    // Simulation du paiement
+    // Simuler paiement
     await new Promise((resolve) => setTimeout(resolve, 2000));
-
     setIsSubmitting(false);
     setShowPayment(false);
     setIsSuccess(true);
@@ -285,12 +254,8 @@ function BookingForm() {
               nom: "",
               email: "",
               telephone: "",
-              service: "meuble",
-              surface: "",
+              service: "",
               distance: "",
-              adresse: "",
-              description: "",
-              datePreferee: "",
             });
           }}
           className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
@@ -333,7 +298,7 @@ function BookingForm() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Distance:</span>
-                <span className="font-medium">{formData.distance} km</span>
+                <span className="font-medium">{formData.distance || 0} km</span>
               </div>
               <div className="border-t pt-3">
                 <div className="flex justify-between text-lg font-bold">
@@ -356,7 +321,6 @@ function BookingForm() {
                   Simulation de paiement Stripe
                 </p>
               </div>
-
               <button
                 onClick={handlePayment}
                 disabled={isSubmitting}
@@ -379,85 +343,98 @@ function BookingForm() {
   }
 
   return (
-    <motion.div
+    <motion.form
+      onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden"
+      className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden p-6"
     >
-      <form onSubmit={handleSubmit} className="p-6">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">
-              Détails de votre demande
-            </h3>
+      <h3 className="text-xl font-semibold text-gray-900 mb-6">Réservation</h3>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom complet <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    value={formData.nom}
-                    onChange={(e) => handleChange("nom", e.target.value)}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                      errors.nom ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="Votre nom et prénom"
-                  />
-                </div>
-                {errors.nom && (
-                  <p className="mt-1 text-sm text-red-600">{errors.nom}</p>
-                )}
-              </div>
+      {errors.global && <p className="text-red-500 mb-3">{errors.global}</p>}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                      errors.email ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="votre@email.com"
-                  />
-                </div>
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
-              </div>
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Nom complet *
+          </label>
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={formData.nom}
+              onChange={(e) => handleChange("nom", e.target.value)}
+              className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+        </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Téléphone <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="tel"
-                    value={formData.telephone}
-                    onChange={(e) => handleChange("telephone", e.target.value)}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                      errors.telephone ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="06 12 34 56 78"
-                  />
-                </div>
-                {errors.telephone && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.telephone}
-                  </p>
-                )}
-              </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email *
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+        </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Service <span cl
-(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Téléphone *
+          </label>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="tel"
+              value={formData.telephone}
+              onChange={(e) => handleChange("telephone", e.target.value)}
+              className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Service *
+          </label>
+          <select
+            value={formData.service}
+            onChange={(e) => handleChange("service", e.target.value)}
+            className="w-full border rounded-lg p-2"
+          >
+            <option value="">Sélectionner un service</option>
+            <option value="plomberie">Plomberie</option>
+            <option value="électricité">Électricité</option>
+            <option value="menuiserie">Menuiserie</option>
+          </select>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="mt-6 w-full px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+      >
+        {isSubmitting ? "Traitement..." : "Réserver"}
+      </button>
+    </motion.form>
+  );
+}
+
+// --- App ---
+function App() {
+  return (
+    <div className="App">
+      <Header />
+      <Hero />
+      <BookingForm />
+    </div>
+  );
+}
+
+export default App;
