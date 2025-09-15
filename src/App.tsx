@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -23,7 +23,7 @@ function Header() {
     { to: "/contact", label: "Contact" },
   ];
 
-  const isActiveLink = (path) => location.pathname === path;
+  const isActiveLink = (path: string) => location.pathname === path;
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -196,16 +196,16 @@ function BookingForm() {
     distance: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ global?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (
       !formData.nom ||

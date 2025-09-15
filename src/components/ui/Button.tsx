@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion, MotionProps } from "framer-motion";
 import LoadingSpinner from "./LoadingSpinner";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,6 +10,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   children: ReactNode;
+  whileHover?: MotionProps["whileHover"];
+  whileTap?: MotionProps["whileTap"];
+  // Add more MotionProps here if needed
 }
 
 const variantClasses = {
@@ -27,6 +31,8 @@ const sizeClasses = {
   lg: "px-6 py-3 text-lg",
 };
 
+type MotionButtonProps = MotionProps & ButtonHTMLAttributes<HTMLButtonElement>;
+
 export default function Button({
   variant = "primary",
   size = "md",
@@ -36,14 +42,36 @@ export default function Button({
   children,
   disabled,
   className = "",
-  ...props
+  whileHover,
+  whileTap,
+  ...rest
 }: ButtonProps) {
   const isDisabled = disabled || isLoading;
 
+  // Compose motion props, allowing overrides via props
+  const motionProps: MotionProps = {
+    whileHover: !isDisabled ? whileHover ?? { scale: 1.02 } : undefined,
+    whileTap: !isDisabled ? whileTap ?? { scale: 0.98 } : undefined,
+  };
+
+  // Only pass valid button props to the button element
+  const {
+    onAnimationStart,
+    onAnimationEnd,
+    onDrag,
+    onDragEnd,
+    onDragEnter,
+    onDragExit,
+    onDragLeave,
+    onDragOver,
+    onDragStart,
+    onDrop,
+    ...buttonProps
+  } = rest;
+
   return (
     <motion.button
-      whileHover={!isDisabled ? { scale: 1.02 } : {}}
-      whileTap={!isDisabled ? { scale: 0.98 } : {}}
+      {...motionProps}
       className={`
         inline-flex items-center justify-center gap-2 
         font-medium rounded-lg transition-all duration-200
@@ -55,7 +83,7 @@ export default function Button({
       `}
       disabled={isDisabled}
       aria-busy={isLoading}
-      {...props}
+      {...buttonProps}
     >
       {isLoading ? (
         <LoadingSpinner

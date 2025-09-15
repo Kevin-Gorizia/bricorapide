@@ -28,6 +28,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
     const hasError = !!error;
 
+    // Filter out motion-specific props to avoid type conflicts
+    const { ...inputProps } = props;
+
     return (
       <div className="w-full">
         {label && (
@@ -51,7 +54,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
 
-          <motion.input
+          <input
             ref={ref}
             id={inputId}
             className={`
@@ -76,7 +79,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 ? `${inputId}-helper`
                 : undefined
             }
-            {...props}
+            {...inputProps}
           />
 
           {rightIcon && (
