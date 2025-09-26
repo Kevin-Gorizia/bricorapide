@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
@@ -7,7 +6,7 @@ import { useNotification } from "../../contexts/UseNotification";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatPrice } from "../../utils/pricing";
 import type { BookingFormData, PricingCalculation } from "../../types";
-import api from "../../lib/api";
+import api from "../../services/api";
 import Button from "../ui/Button";
 
 interface PaymentSectionProps {
@@ -101,10 +100,26 @@ export default function PaymentSection({
 
         onSuccess();
       }
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        "Erreur lors du traitement de la réservation";
+    } catch (error: unknown) {
+      let message = "Erreur lors du traitement de la réservation";
+      if (error instanceof Error) {
+        // Si l'erreur est une instance d'Error, on peut potentiellement accéder à des propriétés spécifiques
+        // Pour les erreurs Axios, 'response' est souvent présent sur l'objet Error
+        if (
+          "response" in error &&
+          typeof error.response === "object" &&
+          error.response !== null &&
+          "data" in error.response &&
+          typeof error.response.data === "object" &&
+          error.response.data !== null &&
+          "message" in error.response.data
+        ) {
+          message = (error.response.data as { message: string }).message;
+        }
+      } else if (typeof error === "string") {
+        message = error;
+      }
+
       showError(message);
     } finally {
       setIsProcessing(false);

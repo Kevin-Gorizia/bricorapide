@@ -3,8 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX, HiUser, HiLogout } from "react-icons/hi";
-import { useAuth } from "../contexts/AuthContext";
-import Button from "./ui/Button";
+import { useAuth } from "../../contexts/AuthContext";
+import Button from "./Button";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -12,6 +12,7 @@ export default function Header() {
   const { user, logout, isAuthenticated } = useAuth();
   const location = useLocation();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Fermer les menus quand on clique ailleurs
   useEffect(() => {
@@ -22,11 +23,18 @@ export default function Header() {
       ) {
         setIsUserMenuOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node) &&
+        isMobileMenuOpen
+      ) {
+        setIsMobileMenuOpen(false);
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isMobileMenuOpen]);
 
   // Fermer le menu mobile lors du changement de route
   useEffect(() => {
@@ -183,6 +191,7 @@ export default function Header() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
+              ref={mobileMenuRef}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}

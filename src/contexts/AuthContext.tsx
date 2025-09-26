@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import type { User, AuthContextType } from "../types";
-import api from "../lib/api";
+import api from "../services/api";
 import type { ReactNode } from "react";
 import { useNotification } from "./UseNotification";
 
