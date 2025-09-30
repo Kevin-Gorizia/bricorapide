@@ -1,7 +1,4 @@
-/* Tailwind directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Variantes custom */
 @custom-variant dark (&:is(.dark *));
